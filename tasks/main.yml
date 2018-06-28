@@ -1,0 +1,65 @@
+---
+- name: Check if Intel virtualization is supported
+  shell: |
+    set -e
+    grep vmx {{ nested_virtualization_cpuinfo }}
+  ignore_errors: yes
+  register: intel_proccesor
+
+- name: Check if AMD virtualization is supported
+  shell: |
+    set -e
+    grep svm {{ nested_virtualization_cpuinfo }}
+  ignore_errors: yes
+  register: amd_proccesor
+
+- name: Fail in case no Intel or AMD virtualization support is not detected.
+  fail:
+    msg: "The system doesn't seem to have Intel nor AMD virtualization support."
+  when: intel_proccesor.rc != 0 and amd_proccesor != 0
+
+- name: Set facts for Intel virtualization
+  set_fact:
+    nested_virtualization_test_path: "/sys/module/kvm_intel/parameters/nested"
+    nested_virtualization_module_name: "kvm_intel"
+  when: intel_proccesor.rc == 0
+
+- name: Set facts for AMD virtualization
+  set_fact:
+    nested_virtualization_test_path: "/sys/module/kvm_amd/parameters/nested"
+    nested_virtualization_module_name: "kvm_amd"
+  when: amd_proccesor.rc == 0
+
+- name: Test status of nested virtualization
+  shell: |
+    set -e
+    cat {{ nested_virtualization_test_path }}
+  register: actual_status
+
+- include_tasks: enable.yml
+  when:
+    - nested_virtualization_state == "enabled"
+    - "'N' in actual_status.stdout or '0' in actual_status.stdout"
+
+- name: "Persist configuration in {{ nested_virtualization_kvm_config }}"
+  lineinfile:
+    path: "{{ nested_virtualization_kvm_config }}"
+    regexp: "^options {{ nested_virtualization_module_name }}.*$"
+    line: "options {{ nested_virtualization_module_name }} nested=1"
+    create: yes
+  when:
+    - nested_virtualization_state == "enabled"
+
+- include_tasks: disable.yml
+  when:
+    - nested_virtualization_state == "disabled"
+    - "'Y' in actual_status.stdout or '1' in actual_status.stdout"
+
+- name: "Persist configuration in {{ nested_virtualization_kvm_config }}"
+  lineinfile:
+    path: "{{ nested_virtualization_kvm_config }}"
+    regexp: "^options {{ nested_virtualization_module_name }}.*$"
+    line: "options {{ nested_virtualization_module_name }}"
+    create: yes
+  when:
+    - nested_virtualization_state == "disabled"

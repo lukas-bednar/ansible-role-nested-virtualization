@@ -1,0 +1,3 @@
+---
+nested_virtualization_cpuinfo: "/proc/cpuinfo"
+nested_virtualization_kvm_config: "/etc/modprobe.d/kvm.conf"

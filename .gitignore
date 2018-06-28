@@ -1,0 +1,2 @@
+tests/roles/provision_docker
+*.retry
