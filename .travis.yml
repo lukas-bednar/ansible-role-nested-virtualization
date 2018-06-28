@@ -1,0 +1,37 @@
+---
+sudo: required
+language: python
+python: "2.7"
+
+services:
+  - docker
+
+env:
+  global:
+    - ANSIBLE_HOST_KEY_CHECKING="False"
+
+# Install python-pip
+addons:
+  apt:
+    packages:
+      - python-pip
+
+install:
+  # Install ansible
+  - pip install -r tests/requirements.txt
+
+  # Check ansible version
+  - ansible --version
+
+  # Install ansible role tests requirements
+  - ansible-galaxy install -r tests/requirements.yml -p tests/roles/
+
+script:
+  # Basic role syntax check
+  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  # Execute playbook
+  # FIXME: Can not be tested on travis-ci: "The system doesn't seem to have Intel nor AMD virtualization support."
+  #- ansible-playbook tests/test.yml -i tests/inventory
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

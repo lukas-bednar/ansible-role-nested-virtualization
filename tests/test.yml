@@ -1,0 +1,29 @@
+---
+- name: Bring up docker containers
+  hosts: localhost
+  gather_facts: false
+  vars:
+    inventory:
+      - name: nested_virt_centos6
+        image: "chrismeyers/centos6"
+      - name: nested_virt_centos7
+        image: "chrismeyers/centos7"
+      - name: nested_virt_rhel6
+        image: "registry.access.redhat.com/rhel6:latest"
+      - name: nested_virt_rhel7
+        image: "registry.access.redhat.com/rhel:latest"
+  roles:
+    - role: provision_docker
+      provision_docker_inventory: "{{ inventory }}"
+
+
+- name: Run nested-virtualization role to enable nested virtualization
+  hosts: docker_containers
+  roles:
+    - role: "nested-virtualization"
+
+- name: Run nested-virtualization role to disable nested virtualization
+  hosts: docker_containers
+  roles:
+    - role: "nested-virtualization"
+      nested_virtualization_state: disable

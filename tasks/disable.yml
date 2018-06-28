@@ -1,0 +1,10 @@
+---
+- name: "Remove {{ nested_virtualization_module_name }} module"
+  shell: |
+    set -e
+    modprobe -r {{ nested_virtualization_module_name }}
+
+- name: "Activate {{ nested_virtualization_module_name }} module without nested feature"
+  shell: |
+    set -e
+    modprobe {{ nested_virtualization_module_name }}
