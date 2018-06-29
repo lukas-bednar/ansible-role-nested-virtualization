@@ -1,7 +1,11 @@
 Nested Virtualization
 =========
 
-An ansible role to enable or disable nested virtualization on target system.
+An ansible role to enable or disable Nested Virtualization in KVM on target system.
+
+Recognized CPUs
+* Intel
+* AMD
 
 Requirements
 ------------
