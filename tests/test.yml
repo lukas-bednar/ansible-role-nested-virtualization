@@ -26,4 +26,4 @@
   hosts: docker_containers
   roles:
     - role: "nested-virtualization"
-      nested_virtualization_state: disable
+      nested_virtualization_state: "disabled"

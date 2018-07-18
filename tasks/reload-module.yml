@@ -1,0 +1,10 @@
+---
+- name: "Remove {{ nested_virtualization_module_name }} module"
+  modprobe:
+    name: "{{ nested_virtualization_module_name }}"
+    state: absent
+
+- name: "Load {{ nested_virtualization_module_name }} module"
+  modprobe:
+    name: "{{ nested_virtualization_module_name }}"
+    state: present
