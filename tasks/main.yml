@@ -18,17 +18,24 @@
     msg: "The system doesn't seem to have Intel nor AMD virtualization support."
   when: intel_proccesor.rc != 0 and amd_proccesor != 0
 
-- name: Set facts for Intel virtualization
+- name: Set fact for Intel virtualization
   set_fact:
-    nested_virtualization_test_path: "/sys/module/kvm_intel/parameters/nested"
     nested_virtualization_module_name: "kvm_intel"
   when: intel_proccesor.rc == 0
 
-- name: Set facts for AMD virtualization
+- name: Set fact for AMD virtualization
   set_fact:
-    nested_virtualization_test_path: "/sys/module/kvm_amd/parameters/nested"
     nested_virtualization_module_name: "kvm_amd"
   when: amd_proccesor.rc == 0
+
+- name: Set fact for nested virtualization test path
+  set_fact:
+    nested_virtualization_test_path: "/sys/module/{{ nested_virtualization_module_name }}/parameters/nested"
+
+- name: "Ensure {{ nested_virtualization_module_name }} module is available and loaded"
+  modprobe:
+    name: "{{ nested_virtualization_module_name }}"
+    state: present
 
 - name: Test status of nested virtualization
   shell: |
