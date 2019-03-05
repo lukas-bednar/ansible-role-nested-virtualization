@@ -8,3 +8,13 @@
   modprobe:
     name: "{{ nested_virtualization_module_name }}"
     state: present
+    params: "nested=1"
+  when:
+    - nested_virtualization_state == "enabled" 
+
+- name: "Load {{ nested_virtualization_module_name }} module"
+  modprobe:
+    name: "{{ nested_virtualization_module_name }}"
+    state: present
+  when:
+    - nested_virtualization_state == "disabled" 
