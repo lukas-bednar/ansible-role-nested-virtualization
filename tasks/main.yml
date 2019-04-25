@@ -16,7 +16,7 @@
 - name: Fail in case no Intel or AMD virtualization support is not detected.
   fail:
     msg: "The system doesn't seem to have Intel nor AMD virtualization support."
-  when: intel_proccesor.rc != 0 and amd_proccesor != 0
+  when: intel_proccesor.rc != 0 and amd_proccesor.rc != 0
 
 - name: Set fact for Intel virtualization
   set_fact:
