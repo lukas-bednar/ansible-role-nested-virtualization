@@ -4,29 +4,29 @@
     set -e
     grep vmx {{ nested_virtualization_cpuinfo }}
   ignore_errors: yes
-  register: intel_proccesor
+  register: intel_processor
 
 - name: Check if AMD virtualization is supported
   shell: |
     set -e
     grep svm {{ nested_virtualization_cpuinfo }}
   ignore_errors: yes
-  register: amd_proccesor
+  register: amd_processor
 
 - name: Fail in case no Intel or AMD virtualization support is not detected.
   fail:
     msg: "The system doesn't seem to have Intel nor AMD virtualization support."
-  when: intel_proccesor.rc != 0 and amd_proccesor.rc != 0
+  when: intel_processor.rc != 0 and amd_processor.rc != 0
 
 - name: Set fact for Intel virtualization
   set_fact:
     nested_virtualization_module_name: "kvm_intel"
-  when: intel_proccesor.rc == 0
+  when: intel_processor.rc == 0
 
 - name: Set fact for AMD virtualization
   set_fact:
     nested_virtualization_module_name: "kvm_amd"
-  when: amd_proccesor.rc == 0
+  when: amd_processor.rc == 0
 
 - name: Set fact for nested virtualization test path
   set_fact:
