@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: nested-virtualization
   author: Lukas Bednar
   description: "Ansible role to enable or disable nested virtualization"
   company: "Red Hat"
