@@ -53,7 +53,7 @@
     line: "options {{ nested_virtualization_module_name }} nested=1"
     create: yes
   when:
-    - nested_virtualization_state == "enabled"
+    - nested_virtualization_state in ["present", "enabled"]
 
 - name: "Persist configuration in {{ nested_virtualization_kvm_config }}"
   lineinfile:
@@ -62,18 +62,18 @@
     state: absent
     create: yes
   when:
-    - nested_virtualization_state == "disabled"
+    - nested_virtualization_state in ["absent", "disabled"]
 
 # Desired state is enabled but real state is off
 - name: "Reload {{ nested_virtualization_module_name }} module"
   include_tasks: reload-module.yml
   when:
-    - nested_virtualization_state == "enabled"
+    - nested_virtualization_state in ["present", "enabled"]
     - actual_status.stdout in ['N', '0']
 
 # Desired state is disabled but real state is on
 - name: "Reload {{ nested_virtualization_module_name }} module"
   include_tasks: reload-module.yml
   when:
-    - nested_virtualization_state == "disabled"
+    - nested_virtualization_state in ["absent", "disabled"]
     - actual_status.stdout in ['Y', '1']
