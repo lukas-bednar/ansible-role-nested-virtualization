@@ -17,7 +17,7 @@ Role Variables
 
 ```yaml
 ---
-nested_virtualization_state: enabled / disabled
+nested_virtualization_state: present / absent
 ```
 
 Dependencies
@@ -38,7 +38,7 @@ Example Playbook
 - hosts: servers
   roles:
     - role: "nested-virtualization"
-      nested_virtualization_state: "disabled"
+      nested_virtualization_state: "absent"
 ```
 
 License

@@ -1,2 +1,2 @@
 ---
-nested_virtualization_state: "enabled"
+nested_virtualization_state: "present"

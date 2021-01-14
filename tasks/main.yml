@@ -3,30 +3,32 @@
   shell: |
     set -e
     grep vmx {{ nested_virtualization_cpuinfo }}
+  changed_when: no
   ignore_errors: yes
-  register: intel_proccesor
+  register: intel_processor
 
 - name: Check if AMD virtualization is supported
   shell: |
     set -e
     grep svm {{ nested_virtualization_cpuinfo }}
+  changed_when: no
   ignore_errors: yes
-  register: amd_proccesor
+  register: amd_processor
 
 - name: Fail in case no Intel or AMD virtualization support is not detected.
   fail:
     msg: "The system doesn't seem to have Intel nor AMD virtualization support."
-  when: intel_proccesor.rc != 0 and amd_proccesor.rc != 0
+  when: intel_processor.rc != 0 and amd_processor.rc != 0
 
 - name: Set fact for Intel virtualization
   set_fact:
     nested_virtualization_module_name: "kvm_intel"
-  when: intel_proccesor.rc == 0
+  when: intel_processor.rc == 0
 
 - name: Set fact for AMD virtualization
   set_fact:
     nested_virtualization_module_name: "kvm_amd"
-  when: amd_proccesor.rc == 0
+  when: amd_processor.rc == 0
 
 - name: Set fact for nested virtualization test path
   set_fact:
@@ -41,6 +43,7 @@
   shell: |
     set -e
     cat {{ nested_virtualization_test_path }}
+  changed_when: no
   register: actual_status
 
 - name: "Persist configuration in {{ nested_virtualization_kvm_config }}"
@@ -50,7 +53,7 @@
     line: "options {{ nested_virtualization_module_name }} nested=1"
     create: yes
   when:
-    - nested_virtualization_state == "enabled"
+    - nested_virtualization_state in ["present", "enabled"]
 
 - name: "Persist configuration in {{ nested_virtualization_kvm_config }}"
   lineinfile:
@@ -59,18 +62,18 @@
     state: absent
     create: yes
   when:
-    - nested_virtualization_state == "disabled"
+    - nested_virtualization_state in ["absent", "disabled"]
 
 # Desired state is enabled but real state is off
 - name: "Reload {{ nested_virtualization_module_name }} module"
   include_tasks: reload-module.yml
   when:
-    - nested_virtualization_state == "enabled"
-    - "'N' in actual_status.stdout or '0' in actual_status.stdout"
+    - nested_virtualization_state in ["present", "enabled"]
+    - actual_status.stdout in ['N', '0']
 
 # Desired state is disabled but real state is on
 - name: "Reload {{ nested_virtualization_module_name }} module"
   include_tasks: reload-module.yml
   when:
-    - nested_virtualization_state == "disabled"
-    - "'Y' in actual_status.stdout or '1' in actual_status.stdout"
+    - nested_virtualization_state in ["absent", "disabled"]
+    - actual_status.stdout in ['Y', '1']
