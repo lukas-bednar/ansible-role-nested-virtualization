@@ -69,11 +69,11 @@
   include_tasks: reload-module.yml
   when:
     - nested_virtualization_state == "enabled"
-    - "'N' in actual_status.stdout or '0' in actual_status.stdout"
+    - actual_status.stdout in ['N', '0']
 
 # Desired state is disabled but real state is on
 - name: "Reload {{ nested_virtualization_module_name }} module"
   include_tasks: reload-module.yml
   when:
     - nested_virtualization_state == "disabled"
-    - "'Y' in actual_status.stdout or '1' in actual_status.stdout"
+    - actual_status.stdout in ['Y', '1']
