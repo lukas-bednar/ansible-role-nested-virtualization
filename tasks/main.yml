@@ -3,6 +3,7 @@
   shell: |
     set -e
     grep vmx {{ nested_virtualization_cpuinfo }}
+  changed_when: no
   ignore_errors: yes
   register: intel_processor
 
@@ -10,6 +11,7 @@
   shell: |
     set -e
     grep svm {{ nested_virtualization_cpuinfo }}
+  changed_when: no
   ignore_errors: yes
   register: amd_processor
 
@@ -41,6 +43,7 @@
   shell: |
     set -e
     cat {{ nested_virtualization_test_path }}
+  changed_when: no
   register: actual_status
 
 - name: "Persist configuration in {{ nested_virtualization_kvm_config }}"
